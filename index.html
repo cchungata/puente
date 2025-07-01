@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirigiendo...</title>
+</head>
+<body>
+  <h2>Redireccionando, espere un momento...</h2>
+  <script>
+    const id = new URLSearchParams(window.location.search).get("id");
+
+    if (!id) {
+      document.body.innerHTML = "<h3>Falta el parámetro ID.</h3>";
+    } else {
+      fetch('https://cdn.jsdelivr.net/gh/cchungata/config-urls/urls.json')
+        .then(res => res.json())
+        .then(data => {
+          if (data.base) {
+            const urlFinal = `${data.base}?id=${id}`;
+            window.location.href = urlFinal;
+          } else {
+            document.body.innerHTML = "<h3>Configuración base no encontrada.</h3>";
+          }
+        })
+        .catch(() => {
+          document.body.innerHTML = "<h3>Error al obtener configuración.</h3>";
+        });
+    }
+  </script>
+</body>
+</html>
