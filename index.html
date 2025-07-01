@@ -10,16 +10,26 @@
     const id_script = new URLSearchParams(window.location.search).get("id_script");
     const codigo = new URLSearchParams(window.location.search).get("codigo");
 
-    if (!id_script || !codigo) {
-      document.body.innerHTML = "<h3>Faltan parámetros (id_script o codigo).</h3>";
+    if (!id_script) {
+      document.body.innerHTML = "<h3>Falta el parámetro 'id_script'.</h3>";
     } else {
       fetch('https://cdn.jsdelivr.net/gh/cchungata/config-urls/urls.json')
         .then(res => res.json())
         .then(data => {
-          const urlBase = data[id_script] || data["default"];
+          const registro = data[id_script] || data["default"];
           
-          if (urlBase) {
-            const urlFinal = `${urlBase}?codigo=${codigo}`;
+          if (registro && registro.url) {
+            let urlFinal = registro.url;
+
+            if (registro.usaCodigo) {
+              if (codigo) {
+                urlFinal += `?codigo=${codigo}`;
+              } else {
+                document.body.innerHTML = "<h3>Este enlace requiere el parámetro 'codigo'.</h3>";
+                return;
+              }
+            }
+
             window.location.href = urlFinal;
           } else {
             document.body.innerHTML = "<h3>Script no encontrado y no hay URL por defecto.</h3>";
@@ -32,4 +42,5 @@
   </script>
 </body>
 </html>
+
 
