@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,36 +8,33 @@
 <body>
   <h2>Redireccionando, espere un momento...</h2>
   <script>
-    const id_script = new URLSearchParams(window.location.search).get("id_script");
-    const codigo = new URLSearchParams(window.location.search).get("codigo");
+    const params = new URLSearchParams(window.location.search);
+    const id_script = params.get("id_script");
+    const codigo = params.get("codigo");
 
     if (!id_script) {
       document.body.innerHTML = "<h3>Falta el parámetro 'id_script'.</h3>";
     } else {
-      fetch('https://cdn.jsdelivr.net/gh/cchungata/config-urls/urls.json')
-        .then(res => res.json())
+      fetch('https://cdn.jsdelivr.net/gh/cchungata/config-urls@main/urls.json?v=' + Date.now())
+        .then(r => r.json())
         .then(data => {
-          const registro = data[id_script] || data["default"];
-          
-          if (registro && registro.url) {
-            let urlFinal = registro.url;
-
-            if (registro.usaCodigo) {
-              if (codigo) {
-                urlFinal += `?codigo=${codigo}`;
-              } else {
+          const reg = data[id_script] || data["default"];
+          if (reg && reg.url) {
+            if (reg.usaCodigo) {
+              if (!codigo) {
                 document.body.innerHTML = "<h3>Este enlace requiere el parámetro 'codigo'.</h3>";
                 return;
               }
+              window.location.href = `${reg.url}?codigo=${encodeURIComponent(codigo)}`;
+            } else {
+              window.location.href = reg.url;
             }
-
-            window.location.href = urlFinal;
           } else {
-            document.body.innerHTML = "<h3>Script no encontrado y no hay URL por defecto.</h3>";
+            document.body.innerHTML = "<h3>El script no existe y no hay URL por defecto.</h3>";
           }
         })
         .catch(() => {
-          document.body.innerHTML = "<h3>Error al obtener configuración.</h3>";
+          document.body.innerHTML = "<h3>Error al obtener la configuración.</h3>";
         });
     }
   </script>
